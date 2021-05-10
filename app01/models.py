@@ -26,6 +26,7 @@ class Tag(models.Model):
 class Article(models.Model):
     """文章表"""
     title = models.CharField(max_length=255, unique=True)
+    decsribe = models.TextField()
     content = models.TextField()
     account = models.ForeignKey("Account", on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
