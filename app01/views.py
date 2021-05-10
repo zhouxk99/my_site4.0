@@ -219,3 +219,9 @@ def article_view(request, username, article_id):
     context = get_info_data(username)
     article_obj = models.Article.objects.filter(pk=article_id).first()
     return render(request,"article_view.html",locals())
+
+def tag_view(request):
+    tag_list = models.Tag.objects.all()
+    order_5_list = models.Tag.objects.order_by('create_date')[:5]
+    return render(request, "tag_view.html",{"tag_list":tag_list,
+                                            "order_5_list":order_5_list})

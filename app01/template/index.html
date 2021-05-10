@@ -1,4 +1,4 @@
-{% extends 'mybase2.html' %}
+{% extends 'publicbase.html' %}
 {% block content %}
    <div class="article_list" >
        {% for article in order_10_list %}
@@ -11,7 +11,6 @@
            </div>
            <div class="small pub_info">
                <span><a>{{ article.account }}</a></span> &nbsp;&nbsp;&nbsp;
-{#               <span>发布于：&nbsp;<a>2012-2</a></span>&nbsp;&nbsp;#}
                <span><a href="">发布于：&nbsp;{{ article.create_date|date:"Y-m-d" }}</a></span>&nbsp;
                <span class="glyphicon glyphicon-comment">评论（{{ article.comment_count }}）</span>&nbsp;&nbsp;&nbsp;
                <span class="glyphicon glyphicon-thumbs-up">点赞（{{ article.up_count }}）</span>&nbsp;&nbsp;&nbsp;

@@ -23,6 +23,7 @@ urlpatterns = [
     path('register/',views.register),
     path('index/', views.index),
     re_path('^$', views.index),
+    path('tag/',views.tag_view),
 
     re_path('^(?P<username>\w+)$', views.home_site),
     re_path('^(?P<username>\w+)/(?P<condition>tag|archive)/(?P<param>.*)/$', views.home_site),

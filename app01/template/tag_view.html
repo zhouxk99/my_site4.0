@@ -1,0 +1,12 @@
+{% extends 'publicbase.html' %}
+{% block content %}
+    <div class="tag_list" >
+       {% for tag in tag_list %}
+       <div class="tag-item clearfix">
+           <h5><a href="">{{ tag.name }}</a></h5>
+
+
+       </div>
+       {% endfor %}
+   </div>
+{% endblock %}
