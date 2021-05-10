@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}新文章{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/new_article.css' %}">
+{% endblock %}
+ 
+ 
+{% block content %}
+    <div class="container">
+        <div class="col-md-4 col-md-offset-1">
+          <form class='form-login' action="/app01/new_article/" method="post">
+              {% csrf_token %}
+              <h2 class="text-center">写点什么吧</h2>
+              <div class="form-group">
+                <label for="title">标题：</label>
+                <input type="text" name='user' class="form-control" id="title" placeholder="Username" autofocus required>
+              </div>
+          <form role="form">
+              <div class="form-group">
+                <label for="content">文本</label>
+<!--                <input type="text" name='user' class="form-control" id="content" placeholder="Username" autofocus required>-->
+                    <textarea class="form-control" id="content" rows="3" > </textarea>
+              </div>
+          </form>
+              <button type="reset" class="btn btn-default pull-left">重置</button>
+              <button type="submit" class="btn btn-primary pull-right">提交</button>
+          </form>
+        </div>
+    </div> <!-- /container -->
+{% endblock %}

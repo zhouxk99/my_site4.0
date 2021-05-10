@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}注册{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+ 
+ 
+{% block content %}
+    <div class="container">
+        <div class="col-md-4 col-md-offset-4">
+          <form class='form-login' action="/register/" method="post">
+              {% csrf_token %}
+              <h2 class="text-center">欢迎注册</h2>
+              <span style="color: #00c4ff;">{{success_msg }}</span>
+<!--              <span style="color: #ff0000;">{{error_msg }}</span>-->
+
+              <div class="form-group">
+                <label for="id_username">用户名：</label>
+                <input type="text" name='user' class="form-control" id="id_username" placeholder="Username" autofocus required>
+              </div>
+
+              <div class="form-group">
+                <label for="email">邮箱：</label>
+                <input type="text" name='email' class="form-control" id="email" placeholder="email" required>
+              </div>
+
+              <div class="form-group">
+                <label for="id_password">密码：</label>
+                <input type="password" name='pwd' class="form-control" id="id_password" placeholder="Password" required>
+              </div>
+
+              <div class="form-group">
+                <label for="id_password_config">确认密码：</label>
+                <input type="password" name='pwd_again' class="form-control" id="id_password_config" placeholder="Password" required>
+              </div>
+              <button type="reset" class="btn btn-default pull-left">重置</button>
+              <button type="submit" class="btn btn-primary pull-right">提交</button>
+
+
+
+          </form>
+        </div>
+    </div> <!-- /container -->
+
+{% if messages %}
+<script>
+     // {% for msg in messages %}
+        alert('{{ msg.message }}');
+
+     // {% endfor %}
+</script>
+{% endif %}
+{% endblock %}

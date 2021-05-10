@@ -1,0 +1,26 @@
+
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<!--    <link rel="stylesheet" type="text/css" href="{% static '/css/mysheet.css' %}">-->
+    <title>css样式展示</title>
+    {####}
+
+    <link rel="stylesheet" type="text/css" href="/static/css/mysheet.css">
+
+
+
+    <h1>css样式展示</h1>
+</head>
+<body>
+
+<p>斜字体演示</p>
+<div>
+    <span id="iter">本元素是div的id=iter的子元素</span>
+</div>
+<span id="iter">本元素不是div的id=iter的子元素</span>
+<h3>span+h3相邻选择器</h3>
+</body>
+</html>
