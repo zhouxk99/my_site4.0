@@ -217,8 +217,8 @@ def get_info_data(username):
 
 def article_view(request, username, article_id):
     context = get_info_data(username)
-    print(context)
     article_obj = models.Article.objects.filter(pk=article_id).first()
+    print(context)
     return render(request,"article_view.html",locals())
 
 def tag_view(request):

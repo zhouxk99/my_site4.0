@@ -1,7 +1,25 @@
 {% extends 'personalbase.html' %}
 {% block content %}
-    <h4 class="text-center">{{ article_obj.title }}</h4>
-    <div class="cont">
-        {{ article_obj.content|safe }}
+    <div class="article_info">
+        <h4 class="text-center">{{ article_obj.title }}</h4>
+        <div class="cont">
+            {{ article_obj.content|safe }}
+        </div>
+        <div id="div_digg">
+            <div class="diggit">
+                <img src="/static/font/dianzan_1.png" width="20" height="20" />
+{#                <span class="diggnum" id="digg_count">1</span>#}
+            </div>
+            <span class="num">
+                111
+            </span>
+            <div class="buryit">
+                <img src="/static/font/cai_1.png" width="20" height="20" />
+{#                <span class="burynum" id="bury_count">0</span>#}
+            </div>
+        <div class="clear"></div>
+        <div class="diggword" style="color: #ff0000;"></div>
+        </div>
     </div>
+
 {% endblock %}
