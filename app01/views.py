@@ -1,9 +1,11 @@
 import datetime
-
+import json
 from django.shortcuts import render, HttpResponse, redirect
 import pymysql
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.db.models import F
+from django.http import JsonResponse
 
 # （from Macbook）Create your views hereeeeeee.
 # (from Thinkpad)Hello!!!
@@ -44,7 +46,7 @@ def login(request):
         # if user == "root" and pwd == "123":
         if obj:
             print('user=' + user, 'pwd=' + pwd)
-            res = redirect("/index")
+            res = redirect("/index/")
             res.set_cookie('login_user', user)
             return res
         else:
@@ -69,7 +71,7 @@ def register(request):
 
         if obj:
             print('XXuser=' + user, 'pwd=' + pwd)
-            res = redirect("/login")
+            res = redirect("/login/")
             error_msg = '账户已存在！'
             messages.error(request, '账户已存在!')
             # return redirect('../register', {'error_msg': error_msg})
@@ -80,7 +82,7 @@ def register(request):
             print('add account success!')
             print('user=', user, 'pwd=', pwd, 'email=', email)
             success_msg = '注册成功！'
-            return redirect('/index', {'success_msg': success_msg})
+            return redirect('/index/', {'success_msg': success_msg})
     return render(request, 'register.html', {'error_msg': error_msg, 'success_msg': success_msg})
 
 
@@ -216,13 +218,42 @@ def get_info_data(username):
 
 
 def article_view(request, username, article_id):
-    context = get_info_data(username)
+    # context = get_info_data(username)
+    user = models.Account.objects.filter(username=username).first()
+    account_info = models.Account.objects.get(username=username)
+    tag_list = models.Tag.objects.filter(account=user)
     article_obj = models.Article.objects.filter(pk=article_id).first()
-    print(context)
-    return render(request,"article_view.html",locals())
+    # print(context)
+    return render(request,"article_view.html", {"user":user,
+                                                "account_info":account_info,
+                                                "tag_list":tag_list,
+                                                "article_obj":article_obj})#,locals())
 
 def tag_view(request):
     tag_list = models.Tag.objects.all()
     order_5_list = models.Tag.objects.order_by('create_date')[:5]
     return render(request, "tagmatch_view.html",{"tag_list":tag_list,
                                             "order_5_list":order_5_list})
+
+# 点赞视图
+def digg(request):
+    print(request.POST)
+
+    article_id=request.POST.get("article_id")
+    is_up=json.loads(request.POST.get("is_up"))
+    user_id=request.user.pk  ###problem
+
+    obj=models.ArticleUpdown.objects.filter(user_id=user_id,article_id=article_id).first()
+
+    response={"stata":True}
+    if not obj:
+        ard=models.ArticleUpdown.objects.create(user_id=user_id,article_id=article_id,is_up=is_up)
+
+        if is_up:
+            models.Article.objects.filter(pk=article_id).update(up_count=F("up_count")+1)
+        else:
+            models.Article.objects.filter(pk=article_id).update(up_count=F("up_count")-1)
+    else:
+        response["stata"]=False
+
+    return JsonResponse(response)

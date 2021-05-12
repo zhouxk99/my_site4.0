@@ -25,6 +25,8 @@ urlpatterns = [
     re_path('^$', views.index),
     path('tag/',views.tag_view),
 
+    path('digg/',views.digg),
+
     re_path('^(?P<username>\w+)$', views.home_site),
     re_path('^(?P<username>\w+)/(?P<condition>tag|archive)/(?P<param>.*)/$', views.home_site),
 

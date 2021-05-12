@@ -1,25 +1,53 @@
 {% extends 'personalbase.html' %}
 {% block content %}
+    {% csrf_token %}
     <div class="article_info">
         <h4 class="text-center">{{ article_obj.title }}</h4>
         <div class="cont">
             {{ article_obj.content|safe }}
         </div>
         <div id="div_digg">
-            <div class="diggit">
+            <div class="diggit action">
                 <img src="/static/font/dianzan_1.png" width="20" height="20" />
 {#                <span class="diggnum" id="digg_count">1</span>#}
             </div>
-            <span class="num">
-                111
-            </span>
-            <div class="buryit">
+            <span class="num">{{ article_obj.up_count }}</span>
+            <div class="buryit action">
                 <img src="/static/font/cai_1.png" width="20" height="20" />
 {#                <span class="burynum" id="bury_count">0</span>#}
             </div>
-        <div class="clear"></div>
-        <div class="diggword" style="color: #ff0000;"></div>
+            <div class="clear"></div>
+            <div class="diggword" id="digg_tips" style="color: #ff0000;"></div>
         </div>
-    </div>
 
+        <script>
+            $('#div_digg .action').click(function() {
+                var is_up=$(this).hasClass('diggit');
+
+                $.ajax({
+                    url:"/digg/",
+                    type:"post",
+                    data:{
+                        "csrfmiddlewaretoken":$("[name='csrfmiddlewaretoken']").val(),
+                        "is_up":is_up,
+                        "article_id":"{{ article_obj.pk }}",
+
+                    },
+                    success:function(data){
+                        console.log(data);
+
+                        if(data.state){
+
+                        }
+                        else{
+                            $("#digg_tips").html("请勿重复操作！")
+                        }
+                    }
+                })
+            })
+        </script>
+
+
+
+    </div>
 {% endblock %}
