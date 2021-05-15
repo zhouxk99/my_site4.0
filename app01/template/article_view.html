@@ -6,21 +6,55 @@
         <div class="cont">
             {{ article_obj.content|safe }}
         </div>
-        <div id="div_digg">
-            <div class="diggit action">
-                <img src="/static/font/dianzan_1.png" width="20" height="20" />
-{#                <span class="diggnum" id="digg_count">1</span>#}
+        <div class="clearfix">
+            <div id="div_digg">
+                <div class="diggit action">
+                    <img src="/static/font/dianzan_1.png" width="20" height="20" />
+{#                  <span class="diggnum" id="digg_count">1</span>#}
+                </div>
+                <span class="num" id="upcount">{{ article_obj.up_count }}</span>
+                <div class="buryit action">
+                    <img src="/static/font/cai_1.png" width="20" height="20" />
+{#                  <span class="burynum" id="bury_count">0</span>#}
+                </div>
+                <div class="clear"></div>
+                <div class="diggword" id="digg_tips" style="color: #ff0000;"></div>
             </div>
-            <span class="num">{{ article_obj.up_count }}</span>
-            <div class="buryit action">
-                <img src="/static/font/cai_1.png" width="20" height="20" />
-{#                <span class="burynum" id="bury_count">0</span>#}
-            </div>
-            <div class="clear"></div>
-            <div class="diggword" id="digg_tips" style="color: #ff0000;"></div>
+        </div>
+        <div class="comments">
+            <p>发表评论</p>
+            <p>昵称：<input type="text" id="commentauthor" class="author" disable="disable" size="50" value="{{ request.Account.username }}"></p>
+            <p>评论内容：</p>
+            <textarea name="" id="comment_content" cols="60" rows="10"></textarea>
+            <p><button class="btn btn-default comment_btn">提交</button></p>
+            <p>相关评论</p>
+            <ul class="list-group comment_list">
+                {% for comment in comment_list %}
+                    <li class="list-group-item">
+                        <div>
+                            <a>{{ comment.user.username }}:</a>
+                        </div>
+                        {% if comment.parent_comment_id %}
+                            <div class="pid_info well">
+                                回复&nbsp;{{ comment.parent_comment.user.username }}({{ comment.parent_comment.create_time|date:"Y-m-d h:m" }}):
+                                <p>&nbsp;&nbsp;{{ comment.parent_comment.content }}</p>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <p>{{ comment.content }}</p>
+                        </div>
+                        <div class="small pub_info">
+                            <span>{{ comment.create_time|date:"Y-m-d h:m" }}</span>&nbsp;&nbsp;&nbsp;
+                            <a style="cursor: pointer" class="reply_comment"
+                               username="{{ comment.user.username }}" comment_pk="{{ comment.pk }}">回复</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
 
         <script>
+            // 点赞 有bug
             $('#div_digg .action').click(function() {
                 var is_up=$(this).hasClass('diggit');
 
@@ -37,6 +71,14 @@
                         console.log(data);
 
                         if(data.state){
+                            if(is_up) {
+                                var val = parseInt($("#upcount").html());
+                                $("#upcount").html(val+1);
+                            }
+                            else{
+                                var val = parseInt($("#upcount").html());
+                                $("#upcount").html(val-1);
+                            }
 
                         }
                         else{
@@ -44,6 +86,96 @@
                         }
                     }
                 })
+            })
+
+            //评论
+            var pid=""
+            $('.comment_btn').click(function(){
+                var content=$("#comment_content").val();
+
+                if(pid){
+                    var index=content.indexOf("\n");
+                    content=content.slice(index+1)
+                }
+
+                $.ajax({
+                    url:"/comment/",
+                    type:"post",
+                    data:{
+                        "csrfmiddlewaretoken":$("[name='csrfmiddlewaretoken']").val(),
+                        "article_id":"{{ article_obj.pk }}",
+                        "content":content,
+                        "pid":pid
+
+                    },
+                    success:function(data){
+
+                        console.log(data);
+
+                        var create_time=data.create_time;
+                        var username=data.username;
+                        var content=data.content;
+                        var create_time2=data.parent_comment_create_time;
+                        var username2=data.parent_comment_username;
+                        var content2=data.parent_comment_content;
+
+                        if(data.pid){
+                            var s=`
+                                <li class="list-group-item">
+                                    <div>
+                                        <a>${username}:</a>
+                                    </div>
+                                    <div class="pid_info well">
+                                        回复&nbsp;${username2}(${create_time2}):
+                                        <p>&nbsp;&nbsp;${content2}</p>
+                                    </div>
+                                    <div>
+                                        <p>${content}</p>
+                                    </div>
+                                    <div class="small pub_info">
+                                        <span>${create_time}</span>&nbsp;&nbsp;&nbsp;
+{#                                        <a>回复</a>#}
+                                    </div>
+                                </li>`
+                            $("ul.comment_list").append(s);
+                        }
+                        else{
+                            var s=`
+                                <li class="list-group-item">
+                                    <div>
+                                        <a>${username}:</a> &nbsp;&nbsp;&nbsp;
+                                        <p>${content}</p>
+                                    </div>
+                                    <div class="small pub_info">
+                                        <span>${create_time}</span>&nbsp;&nbsp;&nbsp;
+{#                                        <a>回复</a>#}
+                                    </div>
+                                </li>`
+                            $("ul.comment_list").append(s);
+                        }
+
+
+                        {#$("ul.comment_list").append(s);#}
+
+
+                        //清空评论框
+                        pid="";
+                        $("#comment_content").val("");
+
+
+                    }
+                })
+
+            })
+
+            //评论回复
+            $('.reply_comment').click(function(){
+
+                $('#comment_content').focus();
+                var val="回复 @"+$(this).attr("username")+"的评论:"+"\n";
+                $('#comment_content').val(val);
+
+                pid=$(this).attr("comment_pk");
             })
         </script>
 

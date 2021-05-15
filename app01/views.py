@@ -223,11 +223,14 @@ def article_view(request, username, article_id):
     account_info = models.Account.objects.get(username=username)
     tag_list = models.Tag.objects.filter(account=user)
     article_obj = models.Article.objects.filter(pk=article_id).first()
-    # print(context)
+
+    comment_list=models.Comment.objects.filter(article_id=article_id)
+
     return render(request,"article_view.html", {"user":user,
                                                 "account_info":account_info,
                                                 "tag_list":tag_list,
-                                                "article_obj":article_obj})#,locals())
+                                                "article_obj":article_obj,
+                                                "comment_list":comment_list})
 
 def tag_view(request):
     tag_list = models.Tag.objects.all()
@@ -256,4 +259,28 @@ def digg(request):
     else:
         response["stata"]=False
 
+    return JsonResponse(response)
+
+
+def comment(request):
+    print(request.POST)
+
+    article_id=request.POST.get("article_id")
+    content = request.POST.get("content")
+    pid = request.POST.get("pid")
+    user_id = request.user.pk  ###problem
+
+    comment_obj=models.Comment.objects.create(user_id=user_id,article_id=article_id,content=content,parent_comment_id=pid)
+
+    response={}
+
+    response["create_time"]=comment_obj.create_time.strftime("%Y-%m-%d %H:%m")
+    response["username"]=comment_obj.user.username
+    response["content"]=comment_obj.content
+    if pid:
+        response["pid"] = pid
+        response["parent_comment_create_time"] = comment_obj.parent_comment.create_time
+        response["parent_comment_username"] = comment_obj.parent_comment.user.username
+        response["parent_comment_content"] = comment_obj.parent_comment.content
+    print(response)
     return JsonResponse(response)

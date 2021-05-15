@@ -5,3 +5,4 @@ from app01 import models
 admin.site.register(models.Account)
 admin.site.register(models.Article)
 admin.site.register(models.Tag)
+admin.site.register(models.ArticleUpdown)

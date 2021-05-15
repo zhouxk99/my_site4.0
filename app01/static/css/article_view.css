@@ -5,7 +5,7 @@
 }
 
 #div_digg {
-    float: left;
+    float: right;
     margin-bottom: 10px;
     margin-right: 30px;
     font-size: 12px;
@@ -44,3 +44,16 @@
 .clear{
     clear: both;
 }
+
+input .author{
+    background-repeat: no-repeat;
+    border: 1px solid #cccccc;
+    padding: 4px 4px 4px 30px;
+    width: 300px;
+    font-size: 13px;
+    background-position: 3px -3px;
+}
+
+/*.reply{*/
+/*    cursor: pointer;*/
+/*}*/
