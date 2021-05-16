@@ -1,0 +1,19 @@
+{% extends 'publicbase.html' %}
+{% block content %}
+    <div class="tag_list" >
+        {% for article in article_list %}
+        <div class="article-item clearfix">
+            <h5><a href="/{{ article.account }}/article/{{ article.pk }}">{{ article.title }}</a></h5>
+            <div class="article-desc">
+                <span>
+                    {{ article.decsribe }}
+                </span>
+            </div>
+            <div class="small pub_info pull-right">
+                <span class="glyphicon glyphicon-comment">评论（{{ article.comment_count }}）</span>&nbsp;&nbsp;&nbsp;
+                <span class="glyphicon glyphicon-thumbs-up">点赞（{{ article.up_count }}）</span>&nbsp;&nbsp;&nbsp;
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,85 +1,36 @@
-<!DOCTYPE html>
-<html lang=zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% load static %}
-    <title>编辑</title>
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="stylesheet" href="{% static 'css/article_view.css' %}">
-    <link href="{% static 'bootstrap-3.4.1-dist/css/bootstrap.css' %}" rel="stylesheet">
-
-    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-    <script src="/static/js/jquery-3.5.1.js"></script>
-
-</head>
-<body>
-    <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#my-nav" aria-expanded="false">
-            <span class="sr-only">切换导航条</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="">Mysite</a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="my-nav">
-          <ul class="nav navbar-nav">
-              <li class="active"><a href="">我的</a></li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-{#              <li><a href="#">登录</a></li>#}
-{#              <li><a href="#">注销</a></li>#}
-          </ul>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
-    </nav>
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="panel panel-default">
-                    <div class="panel-heading">操作</div>
-                    <div class="panel-body">
-                        <a href="">编辑信息</a>
-                        <p><a href="/myedit/newarticle/">添加文章</a></p>
-                    </div>
+{% extends 'editbase.html' %}
+{% block content %}
+    {% csrf_token %}
+    <ul class="list-group comment_list">
+        {% for article in article_list %}
+            <li class="list-group-item">
+                <div>
+                    <a href="/{{ article.account }}/article/{{ article.pk }}">{{ article.title }}</a>
+                    <span>({{ article.create_date|date:"Y-m-d h:m" }})</span>&nbsp;
+{#                                    <a>{{ article.pk }}</a>#}
                 </div>
-
-
-            </div>
-            <div class="col-md-8">
-                <div class="panel panel-default">
-                    <div class="panel-heading">文章</div>
-                    <div class="panel-body">
-                        <ul class="list-group comment_list">
-                        {% for article in article_list %}
-                            <li class="list-group-item">
-                                <div>
-                                    <a>{{ article.title }}</a>
-                                    <span>({{ article.create_date|date:"Y-m-d h:m" }})</span>&nbsp;
-                                </div>
-                                <div class="text-right">
-                                    <a style="cursor: pointer" class="reply_comment">修改</a>
-                                    <a style="cursor: pointer" class="reply_comment">删除</a>
-                                </div>
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    </div>
+                <div class="text-right">
+                    <a href="/myedit/articleedit/{{ article.pk }}" style="cursor: pointer" class="reply_comment">修改</a>
+                    <a style="cursor: pointer" class="reply_comment delete" article_pk="{{ article.pk }}">删除</a>
+                    <a>{{ article_pk }}</a>
                 </div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+            </li>
+        {% endfor %}
+    </ul>
+    <script>
+        $('.delete').click(function (){
+            $.ajax({
+                url:"/delete_article/",
+                type:"post",
+                data:{
+                    "csrfmiddlewaretoken":$("[name='csrfmiddlewaretoken']").val(),
+                    "article_id": "{{ article_pk }}",
+                },
+                success: function (){}
+            })
+        })
+    </script>
+{% endblock %}
 
 
 

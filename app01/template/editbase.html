@@ -5,27 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% load static %}
-    <title>blog</title>
+    <title>编辑</title>
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-
+    <link rel="stylesheet" href="{% static 'css/article_view.css' %}">
     <link href="{% static 'bootstrap-3.4.1-dist/css/bootstrap.css' %}" rel="stylesheet">
 
     <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-    <script src="/app01/static/js/jquery-3.5.1.js"></script>
+    <script src="/static/js/jquery-3.5.1.js"></script>
 
-    <style>
-
-        *{
-            margin: 0;
-            padding: 0;
-        }
-        .pub_info{
-            margin-top: 10px;
-            color: darkgray;
-
-        }
-    </style>
 </head>
 <body>
     <nav class="navbar navbar-default">
@@ -44,17 +32,11 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="my-nav">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/index/">主页</a></li>
-
+              <li class="active"><a href="">我的</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-{#            {% if request.user.is_active %}#}
-{#              <li><a href="#">{{ request.user.username }}</a></li>#}
+{#              <li><a href="#">登录</a></li>#}
 {#              <li><a href="#">注销</a></li>#}
-{#            {% else %}#}
-{#              <li><a href="/login/">登录</a></li>#}
-{#              <li><a href="/register/">注册</a></li>#}
-{#            {% endif %}#}
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
@@ -64,36 +46,28 @@
         <div class="row">
             <div class="col-md-3">
                 <div class="panel panel-default">
-                    <div class="panel-heading">项目名称：Blog网页设计</div>
+                    <div class="panel-heading">操作</div>
                     <div class="panel-body">
-                        <p><b>组长：18123853 陆吴涛</b></p>
-                        <p><b>组员：18123852 周星恺</b></p>
-                        <p><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;18123854 陈宸</b></p>
-                        <p><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;181238XX 孙宇成</b></p>
-
+                        <a href="">编辑信息</a>
+                        <p><a href="/myedit/newarticle/">添加文章</a></p>
                     </div>
                 </div>
-                <div class="panel panel-danger">
-                    <div class="panel-heading">Tags</div>
-                    <div class="panel-body">
-                        {% for tag in order_5_list %}
-                        <div class="tag-item clearfix">
-                            <h5><a href="/tag/{{ tag.name }}">{{ tag.name }}</a></h5>
 
-                        </div>
-                        {% endfor %}
-                        <h5><p>-------------</p></h5>
-                        <h5><a href="/tag/">more>></a></h5>
-                    </div>
-                </div>
+
             </div>
-
             <div class="col-md-8">
-                {% block content %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">文章</div>
+                    <div class="panel-body">
+                        {% block content %}
 
-                {% endblock %}
+                        {% endblock %}
+                    </div>
+                </div>
             </div>
-
         </div>
     </div>
+
+
 </body>
+</html>

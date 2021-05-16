@@ -185,8 +185,6 @@ def home_site(request,username, **kwargs):
 
     # 查询用户每一个年月对应的文章数
 
-
-
     if not user:
         return render(request, "404.html")
     article_list = models.Article.objects.filter(account=user)
@@ -236,6 +234,14 @@ def tag_view(request):
     return render(request, "tagmatch_view.html",{"tag_list":tag_list,
                                             "order_5_list":order_5_list})
 
+def tag2_view(request,param):
+    article_list = models.Article.objects.filter(tags__name=param)
+    # order_5_list = models.Tag.objects.order_by('create_date')[:5]
+    return render(request, "tagmatch2_view.html",{"article_list":article_list,})
+                                            # "order_5_list":order_5_list})
+    return HttpResponse("yes")
+
+
 # 点赞视图
 def digg(request):
     print(request.POST)
@@ -246,7 +252,7 @@ def digg(request):
 
     obj=models.ArticleUpdown.objects.filter(user_id=user_id,article_id=article_id).first()
 
-    response={"stata":True}
+    response={"state":True}
     if not obj:
         ard=models.ArticleUpdown.objects.create(user_id=user_id,article_id=article_id,is_up=is_up)
 
@@ -255,7 +261,7 @@ def digg(request):
         else:
             models.Article.objects.filter(pk=article_id).update(up_count=F("up_count")-1)
     else:
-        response["stata"]=False
+        response["state"]=False
 
     return JsonResponse(response)
 
@@ -267,6 +273,7 @@ def comment(request):
     content = request.POST.get("content")
     pid = request.POST.get("pid")
     user_id = request.user.pk  ###problem
+    models.Article.objects.filter(pk=article_id).update(comment_count=F("comment_count")+1)
 
     comment_obj=models.Comment.objects.create(user_id=user_id,article_id=article_id,content=content,parent_comment_id=pid)
 
@@ -280,7 +287,7 @@ def comment(request):
         response["parent_comment_create_time"] = comment_obj.parent_comment.create_time
         response["parent_comment_username"] = comment_obj.parent_comment.user.username
         response["parent_comment_content"] = comment_obj.parent_comment.content
-    print(response)
+    # print(response)
     return JsonResponse(response)
 
 # @login_required
@@ -295,7 +302,28 @@ def new_article(request):
         title=request.POST.get("title")
         content=request.POST.get("content")
 
-        models.Article.objects.create(title=title,content=content,user=request.user)
+        models.Article.objects.create(title=title,content=content,acount=request.user)
         return redirect("/myedit/")
 
     return render(request, 'new_article.html')
+
+def delete_article(request):
+    print(request.POST)
+    if request.method == 'POST':
+        id=request.POST.get("article_id")
+        article = models.Article.objects.get(pk=id)
+        article.delete()
+
+    return HttpResponse("success")
+
+def article_edit(request,article_id):
+    article=models.Article.objects.get(pk=article_id)
+    print(request.POST)
+    if request.method=="POST":
+        article.title=request.POST.get("title")
+        article.content=request.POST.get("content")
+        article.save()
+        return redirect("/myedit/")
+
+
+    return render(request,'article_change.html',{"article":article})

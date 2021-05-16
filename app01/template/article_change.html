@@ -1,0 +1,49 @@
+{% extends 'base2.html' %}
+{% load static %}
+{% block title %}主页{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/new_article.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="col-md-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">操作</div>
+            <div class="panel-body">
+                <a href="">编辑信息</a>
+                <p><a href="/myedit/newarticle/">添加文章</a></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <form action="" method="post">
+        {% csrf_token %}
+        <div class="add_article">
+{#            <div class="alert-success text-center">添加文章</div>#}
+            <div class="add_article_region">
+                <div class="title form-group">
+                    <label for="">标题</label>
+                    <div>
+                        <input type="text" name="title" value="{{ article.title }}">
+                    </div>
+                </div>
+
+                <div class="content form-group">
+                    <label for="">内容（不支持拖放/粘贴上传图片）</label>
+                    <div>
+                        <textarea name="content" id="article_content" cols="100" rows="10">{{ article.content }}</textarea>
+                    </div>
+                </div>
+
+                <form>
+                    <button type="reset" class="btn btn-default pull-left">重置</button>
+                    <button type="submit" class="btn btn-primary pull-right">提交</button>
+                </form>
+
+            </div>
+        </div>
+
+        </form>
+    </div>
+{% endblock %}
