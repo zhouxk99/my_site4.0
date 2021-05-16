@@ -307,14 +307,14 @@ def new_article(request):
 
     return render(request, 'new_article.html')
 
-def delete_article(request):
-    print(request.POST)
-    if request.method == 'POST':
-        id=request.POST.get("article_id")
-        article = models.Article.objects.get(pk=id)
-        article.delete()
+def delete_article(request,article_id):
+    # print(request.POST)
+    # if request.method == 'POST':
+    #     id=request.POST.get("article_id")
+    article = models.Article.objects.get(pk=article_id)
+    article.delete()
 
-    return HttpResponse("success")
+    return redirect("/myedit/")
 
 def article_edit(request,article_id):
     article=models.Article.objects.get(pk=article_id)

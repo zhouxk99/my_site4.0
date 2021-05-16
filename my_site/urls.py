@@ -27,7 +27,8 @@ urlpatterns = [
 
     path('digg/',views.digg),
     path('comment/',views.comment),
-    path('delete_article/',views.delete_article),
+    # path('delete_article/',views.delete_article),
+    re_path('delete_article/(?P<article_id>\d+)$',views.delete_article),
 
     re_path('myedit/$',views.my_edit),
     re_path('myedit/newarticle/$',views.new_article),
