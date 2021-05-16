@@ -28,6 +28,9 @@ urlpatterns = [
     path('digg/',views.digg),
     path('comment/',views.comment),
 
+    re_path('myedit/$',views.my_edit),
+    re_path('myedit/newarticle/$',views.new_article),
+
     re_path('^(?P<username>\w+)$', views.home_site),
     re_path('^(?P<username>\w+)/(?P<condition>tag|archive)/(?P<param>.*)/$', views.home_site),
 

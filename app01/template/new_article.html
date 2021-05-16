@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base2.html' %}
 {% load static %}
 {% block title %}新文章{% endblock %}
 {% block css %}
@@ -7,25 +7,63 @@
  
  
 {% block content %}
-    <div class="container">
-        <div class="col-md-4 col-md-offset-1">
-          <form class='form-login' action="/app01/new_article/" method="post">
-              {% csrf_token %}
-              <h2 class="text-center">写点什么吧</h2>
-              <div class="form-group">
-                <label for="title">标题：</label>
-                <input type="text" name='user' class="form-control" id="title" placeholder="Username" autofocus required>
-              </div>
-          <form role="form">
-              <div class="form-group">
-                <label for="content">文本</label>
-<!--                <input type="text" name='user' class="form-control" id="content" placeholder="Username" autofocus required>-->
-                    <textarea class="form-control" id="content" rows="3" > </textarea>
-              </div>
-          </form>
-              <button type="reset" class="btn btn-default pull-left">重置</button>
-              <button type="submit" class="btn btn-primary pull-right">提交</button>
-          </form>
+    <div class="col-md-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">操作</div>
+            <div class="panel-body">
+                <a href="">编辑信息</a>
+                <p><a href="/myedit/newarticle/">添加文章</a></p>
+            </div>
         </div>
-    </div> <!-- /container -->
+    </div>
+    <div class="col-md-6">
+        <form action="" method="post">
+        {% csrf_token %}
+        <div class="add_article">
+{#            <div class="alert-success text-center">添加文章</div>#}
+            <div class="add_article_region">
+                <div class="title form-group">
+                    <label for="">标题</label>
+                    <div>
+                        <input type="text" name="title">
+                    </div>
+                </div>
+
+                <div class="content form-group">
+                    <label for="">内容（不支持拖放/粘贴上传图片）</label>
+                    <div>
+                        <textarea name="content" id="article_content" cols="100" rows="10"></textarea>
+                    </div>
+                </div>
+
+                <form>
+                    <button type="reset" class="btn btn-default pull-left">重置</button>
+                    <button type="submit" class="btn btn-primary pull-right">提交</button>
+                </form>
+
+            </div>
+        </div>
+
+        </form>
+    </div>
+{#        <div class="col-md-4 col-md-offset-1">#}
+{#          <form class='form-login' action="/app01/new_article/" method="post">#}
+{#              {% csrf_token %}#}
+{#              <h2 class="text-center">写点什么吧</h2>#}
+{#              <div class="form-group">#}
+{#                <label for="title">标题：</label>#}
+{#                <input type="text" name='user' class="form-control" id="title" placeholder="Username" autofocus required>#}
+{#              </div>#}
+{#          <form role="form">#}
+{#              <div class="form-group">#}
+{#                <label for="content">文本</label>#}
+{#<!--                <input type="text" name='user' class="form-control" id="content" placeholder="Username" autofocus required>-->#}
+{#                    <textarea class="form-control" id="content" rows="3" > </textarea>#}
+{#              </div>#}
+{#          </form>#}
+{#              <button type="reset" class="btn btn-default pull-left">重置</button>#}
+{#              <button type="submit" class="btn btn-primary pull-right">提交</button>#}
+{#          </form>#}
+{#        </div>#}
+{#    </div> <!-- /container -->#}
 {% endblock %}

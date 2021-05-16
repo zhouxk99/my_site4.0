@@ -1,5 +1,7 @@
 import datetime
 import json
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse, redirect
 import pymysql
 from django.views.decorators.csrf import csrf_exempt
@@ -107,10 +109,6 @@ def index(request):
                                          "order_10_list":order_10_list,
                                          "tag_list":tag_list,
                                          "order_5_list":order_5_list})
-
-
-def new_article(request):
-    return render(request, 'new_article.html')
 
 
 def login_view(request):
@@ -284,3 +282,20 @@ def comment(request):
         response["parent_comment_content"] = comment_obj.parent_comment.content
     print(response)
     return JsonResponse(response)
+
+# @login_required
+def my_edit(request):
+    # article_list=models.Article.objects.filter(account=request.user)
+    article_list = models.Article.objects.all()
+    return render(request,"myedit.html",{"article_list":article_list})
+
+
+def new_article(request):
+    if request.method=="POST":
+        title=request.POST.get("title")
+        content=request.POST.get("content")
+
+        models.Article.objects.create(title=title,content=content,user=request.user)
+        return redirect("/myedit/")
+
+    return render(request, 'new_article.html')
