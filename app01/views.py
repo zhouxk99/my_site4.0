@@ -1,6 +1,5 @@
 import datetime
 import json
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse, redirect
 import pymysql
@@ -8,10 +7,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.db.models import F
 from django.http import JsonResponse
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as D_login
+from django.contrib.auth.models import User as D_User
 
-# （from Macbook）Create your views hereeeeeee.
-# (from Thinkpad)Hello!!!
 from app01 import models
+from django.conf import settings
 
 
 def toast(request):
@@ -36,21 +37,37 @@ def runoob(request):
 @csrf_exempt
 def login(request):
     error_msg = ''
+    if request.session.get('is_login', None):  # 防止重复登录
+        print('已经登陆')
+        return redirect('/index/')
     if request.method == "POST":
         user = request.POST.get('user', None)  # 避免提交空，时异常
-        # user = user.strip()  # 用户输入末尾有空格是去空格
         pwd = request.POST.get('pwd', None)
+        print(request.POST)
         obj = models.Account.objects.filter(username=user, password=pwd).first()
-        # obj = models.Account.objects.get(name=user)
+        user_auth = authenticate(request, username=user, password=pwd)
+        print(user_auth)
 
-        # obj = models.Account.username.filter(username=user)
-
-        # if user == "root" and pwd == "123":
-        if obj:
-            print('user=' + user, 'pwd=' + pwd)
+        if user_auth is not None:
+            D_login(request, user_auth)
+            print("auth success")
             res = redirect("/index/")
-            res.set_cookie('login_user', user)
+            res.set_cookie('login_user', user_auth)
+            request.session['is_login'] = True  # 往session字典内写入用户状态和数据
+            request.session['user_id'] = user_auth.id
+            request.session['user_name'] = user_auth.username
             return res
+        #     return redirect("/")
+
+        # if obj:
+        #     print('user=' + user, 'pwd=' + pwd)
+        #     user = models.Account.objects.get(username=user)
+        #     res = redirect("/index/")
+        #     res.set_cookie('login_user', user)
+        #     request.session['is_login'] = True  # 往session字典内写入用户状态和数据
+        #     request.session['user_id'] = user.id
+        #     request.session['user_name'] = user.username
+        #     return res
         else:
             error_msg = "账号或者密码不对"
             print(error_msg)
@@ -80,8 +97,9 @@ def register(request):
         elif pwd != pwd_again:
             messages.error(request, '两次密码不一致!')
         else:
+            d_user = D_User.objects.create_user(username=user, password=pwd, email=email)
             models.Account.objects.create(username=user, password=pwd, email=email)
-            print('add account success!')
+            d_user.save()
             print('user=', user, 'pwd=', pwd, 'email=', email)
             success_msg = '注册成功！'
             return redirect('/index/', {'success_msg': success_msg})
@@ -89,6 +107,13 @@ def register(request):
 
 
 ##########################################
+def logout(request):
+    if not request.session.get('is_login', None):  # 如果本来就未登录，也就没有登出一说
+        return redirect("/index/")
+    request.session.flush()  # 将session中的所有内容全部清空
+    print("登出成功")
+    return redirect('/index/')
+
 
 def base(request):
     return render(request, 'base.html')
@@ -105,10 +130,10 @@ def index(request):
     order_10_list = models.Article.objects.order_by('-create_date')[:10]
     tag_list = models.Tag.objects.all()
     order_5_list = models.Tag.objects.order_by('create_date')[:5]
-    return render(request, 'index.html',{"article_list":article_list,
-                                         "order_10_list":order_10_list,
-                                         "tag_list":tag_list,
-                                         "order_5_list":order_5_list})
+    return render(request, 'index.html', {"article_list": article_list,
+                                          "order_10_list": order_10_list,
+                                          "tag_list": tag_list,
+                                          "order_5_list": order_5_list})
 
 
 def login_view(request):
@@ -175,7 +200,8 @@ def sql_test(request):
     #
     # data = cursor.fetchall()
 
-def home_site(request,username, **kwargs):
+
+def home_site(request, username, **kwargs):
     # 个人页面
     # print("username", username)
     user = models.Account.objects.filter(username=username).first()
@@ -190,27 +216,28 @@ def home_site(request,username, **kwargs):
     article_list = models.Article.objects.filter(account=user)
     account_info = models.Account.objects.get(username=username)
     if kwargs:
-        condition=kwargs.get("condition")
-        param=kwargs.get("param")
+        condition = kwargs.get("condition")
+        param = kwargs.get("param")
 
-        if condition=="tag":
+        if condition == "tag":
             article_list = article_list.filter(tags__name=param)
         # 时间标签
         else:
-            year,month=param.split("-")
-            article_list = article_list.filter(create_date__year=year,create_date__month=month)
+            year, month = param.split("-")
+            article_list = article_list.filter(create_date__year=year, create_date__month=month)
 
     tag_list = models.Tag.objects.filter(account=user)
-    return render(request, "home_site.html",{"user":user,
-                                             "account_info":account_info,
-                                             "article_list":article_list,
-                                             "tag_list":tag_list})
+    return render(request, "home_site.html", {"user": user,
+                                              "account_info": account_info,
+                                              "article_list": article_list,
+                                              "tag_list": tag_list})
+
 
 def get_info_data(username):
     user = models.Account.objects.filter(username=username).first()
     account_info = models.Account.objects.get(username=username)
     tag_list = models.Tag.objects.filter(account=user)
-    return {"user":user, "account_info":account_info, "tag_list":tag_list}
+    return {"user": user, "account_info": account_info, "tag_list": tag_list}
 
 
 def article_view(request, username, article_id):
@@ -220,25 +247,27 @@ def article_view(request, username, article_id):
     tag_list = models.Tag.objects.filter(account=user)
     article_obj = models.Article.objects.filter(pk=article_id).first()
 
-    comment_list=models.Comment.objects.filter(article_id=article_id)
+    comment_list = models.Comment.objects.filter(article_id=article_id)
 
-    return render(request,"article_view.html", {"user":user,
-                                                "account_info":account_info,
-                                                "tag_list":tag_list,
-                                                "article_obj":article_obj,
-                                                "comment_list":comment_list})
+    return render(request, "article_view.html", {"user": user,
+                                                 "account_info": account_info,
+                                                 "tag_list": tag_list,
+                                                 "article_obj": article_obj,
+                                                 "comment_list": comment_list})
+
 
 def tag_view(request):
     tag_list = models.Tag.objects.all()
     order_5_list = models.Tag.objects.order_by('create_date')[:5]
-    return render(request, "tagmatch_view.html",{"tag_list":tag_list,
-                                            "order_5_list":order_5_list})
+    return render(request, "tagmatch_view.html", {"tag_list": tag_list,
+                                                  "order_5_list": order_5_list})
 
-def tag2_view(request,param):
+
+def tag2_view(request, param):
     article_list = models.Article.objects.filter(tags__name=param)
     # order_5_list = models.Tag.objects.order_by('create_date')[:5]
-    return render(request, "tagmatch2_view.html",{"article_list":article_list,})
-                                            # "order_5_list":order_5_list})
+    return render(request, "tagmatch2_view.html", {"article_list": article_list, })
+    # "order_5_list":order_5_list})
     return HttpResponse("yes")
 
 
@@ -246,22 +275,22 @@ def tag2_view(request,param):
 def digg(request):
     print(request.POST)
 
-    article_id=request.POST.get("article_id")
-    is_up=json.loads(request.POST.get("is_up"))
-    user_id=request.user.pk  ###problem
+    article_id = request.POST.get("article_id")
+    is_up = json.loads(request.POST.get("is_up"))
+    user_id = request.user.pk  ###problem
 
-    obj=models.ArticleUpdown.objects.filter(user_id=user_id,article_id=article_id).first()
+    obj = models.ArticleUpdown.objects.filter(user_id=user_id, article_id=article_id).first()
 
-    response={"state":True}
+    response = {"state": True}
     if not obj:
-        ard=models.ArticleUpdown.objects.create(user_id=user_id,article_id=article_id,is_up=is_up)
+        ard = models.ArticleUpdown.objects.create(user_id=user_id, article_id=article_id, is_up=is_up)
 
         if is_up:
-            models.Article.objects.filter(pk=article_id).update(up_count=F("up_count")+1)
+            models.Article.objects.filter(pk=article_id).update(up_count=F("up_count") + 1)
         else:
-            models.Article.objects.filter(pk=article_id).update(up_count=F("up_count")-1)
+            models.Article.objects.filter(pk=article_id).update(up_count=F("up_count") - 1)
     else:
-        response["state"]=False
+        response["state"] = False
 
     return JsonResponse(response)
 
@@ -269,19 +298,20 @@ def digg(request):
 def comment(request):
     print(request.POST)
 
-    article_id=request.POST.get("article_id")
+    article_id = request.POST.get("article_id")
     content = request.POST.get("content")
     pid = request.POST.get("pid")
     user_id = request.user.pk  ###problem
-    models.Article.objects.filter(pk=article_id).update(comment_count=F("comment_count")+1)
+    models.Article.objects.filter(pk=article_id).update(comment_count=F("comment_count") + 1)
 
-    comment_obj=models.Comment.objects.create(user_id=user_id,article_id=article_id,content=content,parent_comment_id=pid)
+    comment_obj = models.Comment.objects.create(user_id=user_id, article_id=article_id, content=content,
+                                                parent_comment_id=pid)
 
-    response={}
+    response = {}
 
-    response["create_time"]=comment_obj.create_time.strftime("%Y-%m-%d %H:%m")
-    response["username"]=comment_obj.user.username
-    response["content"]=comment_obj.content
+    response["create_time"] = comment_obj.create_time.strftime("%Y-%m-%d %H:%m")
+    response["username"] = comment_obj.user.username
+    response["content"] = comment_obj.content
     if pid:
         response["pid"] = pid
         response["parent_comment_create_time"] = comment_obj.parent_comment.create_time
@@ -290,24 +320,28 @@ def comment(request):
     # print(response)
     return JsonResponse(response)
 
-# @login_required
+
+@login_required
 def my_edit(request):
-    # article_list=models.Article.objects.filter(account=request.user)
-    article_list = models.Article.objects.all()
-    return render(request,"myedit.html",{"article_list":article_list})
+    user_id = models.Account.objects.filter(username=request.user).first()
+    article_list = models.Article.objects.filter(account_id=user_id)
+    # article_list = models.Article.objects.all()
+    print(request.user)
+    return render(request, "myedit.html", {"article_list": article_list})
 
-
+@login_required
 def new_article(request):
-    if request.method=="POST":
-        title=request.POST.get("title")
-        content=request.POST.get("content")
-
-        models.Article.objects.create(title=title,content=content,acount=request.user)
+    if request.method == "POST":
+        title = request.POST.get("title")
+        content = request.POST.get("content")
+        user_id = models.Account.objects.filter(username=request.user).first()
+        models.Article.objects.create(title=title, content=content, account=user_id)
         return redirect("/myedit/")
 
     return render(request, 'new_article.html')
 
-def delete_article(request,article_id):
+
+def delete_article(request, article_id):
     # print(request.POST)
     # if request.method == 'POST':
     #     id=request.POST.get("article_id")
@@ -316,14 +350,14 @@ def delete_article(request,article_id):
 
     return redirect("/myedit/")
 
-def article_edit(request,article_id):
-    article=models.Article.objects.get(pk=article_id)
+
+def article_edit(request, article_id):
+    article = models.Article.objects.get(pk=article_id)
     print(request.POST)
-    if request.method=="POST":
-        article.title=request.POST.get("title")
-        article.content=request.POST.get("content")
+    if request.method == "POST":
+        article.title = request.POST.get("title")
+        article.content = request.POST.get("content")
         article.save()
         return redirect("/myedit/")
 
-
-    return render(request,'article_change.html',{"article":article})
+    return render(request, 'article_change.html', {"article": article})

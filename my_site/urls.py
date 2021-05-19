@@ -22,6 +22,8 @@ urlpatterns = [
     path('login/', views.login),
     path('register/',views.register),
     path('index/', views.index),
+    path('logout/', views.logout),
+
     re_path('^$', views.index),
     path('tag/',views.tag_view),
 

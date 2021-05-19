@@ -23,7 +23,7 @@
         </div>
         <div class="comments">
             <p>发表评论</p>
-            <p>昵称：<input type="text" id="commentauthor" class="author" disable="disable" size="50" value="{{ request.Account.username }}"></p>
+            <p>昵称：<input type="text" id="commentauthor" class="author" disable="disable" size="50" value="{{ request.user.username }}"></p>
             <p>评论内容：</p>
             <textarea name="" id="comment_content" cols="60" rows="10"></textarea>
             <p><button class="btn btn-default comment_btn">提交</button></p>

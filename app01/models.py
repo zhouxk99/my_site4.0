@@ -1,9 +1,11 @@
 from django.db import models
-
+from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 
+# class Account(models.Model):
 class Account(models.Model):
+
     """账户表"""
     username = models.CharField(max_length=64, unique=True)
     email = models.EmailField(unique=True)
