@@ -1,0 +1,57 @@
+{% extends 'publicbase.html' %}
+{% block title %}搜索结果{% endblock %}
+{% block content %}
+    <p>搜索结果</p>
+    {% if type == 'article' %}
+    <ul class="list-group">
+        {% for article in text %}
+            <li class="list-group-item">
+                <div class="article-item clearfix">
+                    <h5><a href="/{{ article.account }}/article/{{ article.pk }}">{{ article.title }}</a></h5>
+                    <div class="article-desc">
+                        <span>
+                            {{ article.decsribe }}
+                        </span>
+                    </div>
+                    <div class="small pub_info">
+                        <span><a href="/{{ article.account }}">{{ article.account }}</a></span> &nbsp;&nbsp;&nbsp;
+                        <span>发布于：&nbsp;{{ article.create_date|date:"Y-m-d" }}</span>&nbsp;
+                        <span class="glyphicon glyphicon-comment">评论（{{ article.comment_count }}）</span>&nbsp;&nbsp;&nbsp;
+                        <span class="glyphicon glyphicon-thumbs-up">点赞（{{ article.up_count }}）</span>&nbsp;&nbsp;&nbsp;
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if type == 'tag' %}
+    <ul class="list-group">
+        {% for article in text %}
+            <li class="list-group-item">
+                <div class="article-item clearfix">
+                    <h5><a href="/{{ article.account }}/article/{{ article.pk }}">{{ article.title }}</a></h5>
+                    <div class="article-desc">
+                        <span>
+                            {{ article.decsribe }}
+                        </span>
+                    </div>
+                    <div class="small pub_info">
+                        <span><a href="/{{ article.account }}">{{ article.account }}</a></span> &nbsp;&nbsp;&nbsp;
+                        <span>发布于：&nbsp;{{ article.create_date|date:"Y-m-d" }}</span>&nbsp;
+                        <span class="glyphicon glyphicon-comment">评论（{{ article.comment_count }}）</span>&nbsp;&nbsp;&nbsp;
+                        <span class="glyphicon glyphicon-thumbs-up">点赞（{{ article.up_count }}）</span>&nbsp;&nbsp;&nbsp;
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if type == 'none' %}
+        <ul class="list-group">
+            <div>
+                <h3>未找到相关内容</h3>
+                <p><a href="/">返回网站首页</a></p>
+            </div>
+        </ul>
+    {% endif %}
+{% endblock %}

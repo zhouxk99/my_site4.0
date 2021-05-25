@@ -19,7 +19,7 @@ class Account(models.Model):
 class Tag(models.Model):
     """标签"""
     name = models.CharField(max_length=64, unique=True)
-    account = models.ForeignKey("Account", on_delete=models.CASCADE)
+    # account = models.ForeignKey("Account", on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

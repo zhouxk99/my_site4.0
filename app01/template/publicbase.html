@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% load static %}
-    <title>blog</title>
+    <title>{% block title %}blog{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
 
     <link href="{% static 'bootstrap-3.4.1-dist/css/bootstrap.css' %}" rel="stylesheet">
@@ -49,7 +49,7 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% if request.user.is_active %}
-              <li><a href="#">{{ request.user.username }}</a></li>
+              <li><a href="/myedit/">{{ request.user.username }}</a></li>
               <li><a href="/logout/">注销</a></li>
             {% else %}
               <li><a href="/login/">登录</a></li>
@@ -69,8 +69,20 @@
                         <p><b>组长：18123853 陆吴涛</b></p>
                         <p><b>组员：18123852 周星恺</b></p>
                         <p><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;18123854 陈宸</b></p>
-                        <p><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;181238XX 孙宇成</b></p>
+                        <p><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;18123829 孙宇成</b></p>
 
+                    </div>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading">搜索</div>
+                    <div class="panel-body">
+                        <label for=""></label>
+                        <form action="/search/" method="get">
+                            {% csrf_token %}
+                            <input type="text" name="search" value="">
+{#                               <a class="btn btn-default" href="/search/{{ value }}" role="button">search</a>#}
+                            <button type="submit" class="btn btn-default btn-sm">search</button>
+                        </form>
                     </div>
                 </div>
                 <div class="panel panel-danger">

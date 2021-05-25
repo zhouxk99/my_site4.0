@@ -34,10 +34,14 @@ urlpatterns = [
 
     re_path('myedit/$',views.my_edit),
     re_path('myedit/newarticle/$',views.new_article),
+    re_path('myedit/infoedit/',views.info),
     re_path('myedit/articleedit/(?P<article_id>\d+)$',views.article_edit),
 
     re_path('^(?P<username>\w+)$', views.home_site),
     re_path('^(?P<username>\w+)/(?P<condition>tag|archive)/(?P<param>.*)/$', views.home_site),
     re_path('tag/(?P<param>.*)/$', views.tag2_view),
     re_path('^(?P<username>\w+)/article/(?P<article_id>\d+)$', views.article_view),
+
+    # re_path('search/(?P<param>.*)/$', views.searchresult)
+    path('search/', views.searchresult)
 ]

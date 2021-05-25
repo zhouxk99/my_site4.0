@@ -11,7 +11,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">操作</div>
             <div class="panel-body">
-                <a href="">编辑信息</a>
+                <a href="/myedit/infoedit/">编辑信息</a>
                 <p><a href="/myedit/newarticle/">添加文章</a></p>
             </div>
         </div>
@@ -26,6 +26,20 @@
                     <label for="">标题</label>
                     <div>
                         <input type="text" name="title" value="{{ article.title }}">
+                    </div>
+                </div>
+
+                <div class="tag form-group">
+                    <label for="">标签</label>
+                    <div>
+                        <input type="text" name="tag" value="{{ article.tags }}">
+                    </div>
+                </div>
+
+                <div class="describe form-group">
+                    <label for="">简介(可以为空)</label>
+                    <div>
+                        <textarea name="describe" id="article_describe" cols="100" rows="5">{{ article.decsribe }}</textarea>
                     </div>
                 </div>
 
@@ -45,5 +59,12 @@
         </div>
 
         </form>
+        <script charset="utf-8" src="/static/kindeditor/kindeditor-all.js"></script>
+{#    <script charset="utf-8" src="/editor/lang/zh-CN.js"></script>#}
+        <script>
+                KindEditor.ready(function(K) {
+                        window.editor = K.create('#article_content');
+                });
+        </script>
     </div>
 {% endblock %}

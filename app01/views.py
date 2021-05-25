@@ -14,26 +14,6 @@ from django.contrib.auth.models import User as D_User
 from app01 import models
 from django.conf import settings
 
-
-def toast(request):
-    messages.success(request, "哈哈哈哈")
-
-
-def test_view(request):
-    print("执行业务逻辑计算中")
-
-    return HttpResponse("test_view success")
-
-
-def runoob(request):
-    # context          = {}
-    # context['hello'] = 'Hello World!'
-    # return render(request, 'runoob.html', context)
-
-    views_name = "菜鸟教程"
-    return render(request, "runoob.html", {"name": views_name})
-
-
 @csrf_exempt
 def login(request):
     error_msg = ''
@@ -102,7 +82,7 @@ def register(request):
             d_user.save()
             print('user=', user, 'pwd=', pwd, 'email=', email)
             success_msg = '注册成功！'
-            return redirect('/index/', {'success_msg': success_msg})
+            return redirect('/login/', {'success_msg': success_msg})
     return render(request, 'register.html', {'error_msg': error_msg, 'success_msg': success_msg})
 
 
@@ -136,36 +116,6 @@ def index(request):
                                           "order_5_list": order_5_list})
 
 
-def login_view(request):
-    # html = """
-    #
-    # """
-    #
-    # return HttpResponse(html)
-    return render(request, 'form.html')
-
-
-def article(request):
-    return HttpResponse('article')
-
-
-def article_year(request, year, version):
-    version_detail = "1.0.1"
-    return HttpResponse('article %s %s %s' % (year, version, version_detail))
-
-
-def article_detail(request, year, month, slug):
-    return HttpResponse('article %s-%s %s' % (year, month, slug))
-
-
-def article_archive(request, year, month):
-    return HttpResponse('article 动态 %s-%s' % (year, month))
-
-
-def article_archive3(request, arg1, arg2, slug):
-    return HttpResponse('article 动态 %s-%s-%s' % (arg1, arg2, slug))
-
-
 def current_datetime(request):
     now = datetime.datetime.now()
     html = "<html><body>It is now %s.</body></html>" % now
@@ -183,22 +133,6 @@ def detail(request):
     return render(request, 'try_python/my_site/html/mysheet.html')
 
 
-def sql_test(request):
-    conn = pymysql.connect(host='localhost', port=8889, user='root', passwd='root', db='data_structure')
-    cursor = conn.cursor()  # 游标
-
-    cursor.execute("select username, password from user;")
-
-    data = cursor.fetchall()
-
-    return HttpResponse(str(data))
-
-    # conn = pymysql.connect(host='w.rdc.sae.sina.com.cn:3306', port=3306, user='n2o3n3x353', passwd='ijx1j43w5wmk4l1mmz134kzmwx25lw5ywxw3x0h2', db='app_tryprogram')
-    # cursor = conn.cursor()  # 游标
-    #
-    # cursor.execute("select username, password from user;")
-    #
-    # data = cursor.fetchall()
 
 
 def home_site(request, username, **kwargs):
@@ -226,7 +160,7 @@ def home_site(request, username, **kwargs):
             year, month = param.split("-")
             article_list = article_list.filter(create_date__year=year, create_date__month=month)
 
-    tag_list = models.Tag.objects.filter(account=user)
+    tag_list = models.Tag.objects.all()
     return render(request, "home_site.html", {"user": user,
                                               "account_info": account_info,
                                               "article_list": article_list,
@@ -236,7 +170,7 @@ def home_site(request, username, **kwargs):
 def get_info_data(username):
     user = models.Account.objects.filter(username=username).first()
     account_info = models.Account.objects.get(username=username)
-    tag_list = models.Tag.objects.filter(account=user)
+    tag_list = models.Tag.objects.all()
     return {"user": user, "account_info": account_info, "tag_list": tag_list}
 
 
@@ -244,7 +178,7 @@ def article_view(request, username, article_id):
     # context = get_info_data(username)
     user = models.Account.objects.filter(username=username).first()
     account_info = models.Account.objects.get(username=username)
-    tag_list = models.Tag.objects.filter(account=user)
+    tag_list = models.Tag.objects.all()
     article_obj = models.Article.objects.filter(pk=article_id).first()
 
     comment_list = models.Comment.objects.filter(article_id=article_id)
@@ -326,19 +260,46 @@ def my_edit(request):
     user_id = models.Account.objects.filter(username=request.user).first()
     article_list = models.Article.objects.filter(account_id=user_id)
     # article_list = models.Article.objects.all()
-    print(request.user)
+    # print(request.user)
     return render(request, "myedit.html", {"article_list": article_list})
 
 @login_required
 def new_article(request):
+    error_msg = ''
     if request.method == "POST":
         title = request.POST.get("title")
+        if not title:
+            error_msg = 'title!'
+        tag = request.POST.get("tag")
+        describe = request.POST.get("describe")
         content = request.POST.get("content")
         user_id = models.Account.objects.filter(username=request.user).first()
-        models.Article.objects.create(title=title, content=content, account=user_id)
-        return redirect("/myedit/")
+        # print(tag)
+        if title and content:
+            if tag:
+                print(111222333)
+                aa = models.Tag.objects.filter(name=tag).first()
+                if not aa:
+                    aa = models.Tag.objects.create(name=tag)
+                    # tag = models.Tag.objects.filter(name=tag).first()
+            else:
+                tag = 'blank'
+                aa = models.Tag.objects.filter(name=tag).first()
+                print(tag)
+            # if not describe:
+            #     describe = content
+            #     if len(content) > 33:
+            #         describe = describe.slice(33)
+            models.Article.objects.create(title=title, tags=aa, content=content, decsribe=describe, account=user_id)
+            return redirect("/myedit/")
+        else:
+            print('error')
+            error_msg = '标题与文章不能为空！'
+            # return redirect("/myedit/newarticle", {"error_msg": error_msg})
+        # models.Article.objects.create(title=title, tags_id=tag, decsribe=describe, content=content, account=user_id)
 
-    return render(request, 'new_article.html')
+    return render(request, 'new_article.html', {'error_msg': error_msg})
+
 
 
 def delete_article(request, article_id):
@@ -357,7 +318,51 @@ def article_edit(request, article_id):
     if request.method == "POST":
         article.title = request.POST.get("title")
         article.content = request.POST.get("content")
+        article.decsribe = request.POST.get("describe")
         article.save()
         return redirect("/myedit/")
 
     return render(request, 'article_change.html', {"article": article})
+
+# def searchresult(request,param):
+#     if models.Article.objects.filter(title=param).first():
+#         type = 'article'
+#         text = models.Article.objects.filter(title=param)
+#     elif models.Tag.objects.filter(name=param):
+#         type = 'tag'
+#         tag_name = models.Tag.objects.filter(name=param).first()
+#         text = models.Article.objects.filter(tags=tag_name)
+#     else:
+#         type = 'none'
+#         text = 'none'
+#
+#     return render(request, 'searchresult.html', {'type':type,'text':text})
+
+def searchresult(request):
+    tag_list = models.Tag.objects.all()
+    order_5_list = models.Tag.objects.order_by('create_date')[:5]
+    param = request.GET.get('search')
+    if models.Article.objects.filter(title=param).first():
+        type = 'article'
+        text = models.Article.objects.filter(title=param)
+    elif models.Tag.objects.filter(name=param):
+        type = 'tag'
+        tag_name = models.Tag.objects.filter(name=param).first()
+        text = models.Article.objects.filter(tags=tag_name)
+    else:
+        type = 'none'
+        text = 'none'
+
+
+    return render(request, 'searchresult.html', {'type':type,'text':text,
+                                                 "tag_list": tag_list,
+                                                 "order_5_list": order_5_list})
+@login_required
+def info(request):
+    user = models.Account.objects.filter(username=request.user).first()
+    if request.method == "POST":
+        user.email = request.POST.get("email")
+        user.signature = request.POST.get("signature")
+        user.save()
+        return redirect("/myedit/")
+    return render(request,'info.html',{'user':user})
